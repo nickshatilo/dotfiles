@@ -112,6 +112,8 @@ nnoremap <Leader>0 :10b<CR>
 
 " Toggle NERDTree
 nmap <Leader>n :NERDTreeToggle<CR>
+" Show current file in NERDTree
+nmap <Leader><Space>n :NERDTreeFind<CR>
 
 " Close buffer without closing a split
 map <Leader>w :bp<bar>sp<bar>bn<bar>bd<CR>
@@ -142,7 +144,7 @@ set termguicolors
 
 call plug#begin('~/.vim/plugged')
 
-Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
+Plug 'scrooloose/nerdtree'
 
 Plug 'vim-airline/vim-airline' " Bottom line magic
 
