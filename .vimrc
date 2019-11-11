@@ -98,18 +98,6 @@ vnoremap <space> zf
 nmap <C-n> :bnext<CR>
 nmap <C-p> :bprev<CR>
 
-" Easier switching between buffers
-nnoremap <Leader>1 :1b<CR>
-nnoremap <Leader>2 :2b<CR>
-nnoremap <Leader>3 :3b<CR>
-nnoremap <Leader>4 :4b<CR>
-nnoremap <Leader>5 :5b<CR>
-nnoremap <Leader>6 :6b<CR>
-nnoremap <Leader>7 :7b<CR>
-nnoremap <Leader>8 :8b<CR>
-nnoremap <Leader>9 :9b<CR>
-nnoremap <Leader>0 :10b<CR>
-
 " Toggle NERDTree
 nmap <Leader>n :NERDTreeToggle<CR>
 " Show current file in NERDTree
@@ -120,6 +108,7 @@ map <Leader>w :bp<bar>sp<bar>bn<bar>bd<CR>
 
 " Generate ctags
 nnoremap <Leader>ct :silent ! ctags -R --languages=ruby,javascript --exclude=.git --exclude=log --exclude=node_modules -f .tags<cr>
+nnoremap <Leader>crt :silent ! ripper-tags -f .tags<cr>
 
 "Go between splits
 nmap <C-j> <C-W>j
@@ -186,6 +175,8 @@ Plug 'vim-scripts/BufOnly.vim'
 
 Plug 'ryanoasis/vim-devicons'
 
+Plug 'mattn/emmet-vim'
+
 " Color schemes
 Plug 'sts10/vim-pink-moon'
 Plug 'aswathkk/DarkScene.vim'
@@ -242,17 +233,23 @@ augroup END
 
 " VIM RSPEC "
 
+" Runs whole file
 map <Leader>s :call RunCurrentSpecFile()<CR>
+" Runs nearest spec in the whole file
+map <Leader><Space>s :call RunNearestSpec()<CR>
+" Runs last spec
 map <Leader>l :call RunLastSpec()<CR>
 
-nmap \b :TagbarToggle<CR>
-
 let g:rspec_command = "Dispatch bundle exec rspec {spec}"
+
+" --- TAGBAR ---
+
+nmap \b :TagbarToggle<CR>
 
 " --- LANGUAGE SPECIFIC CONFUGRATION --- "
 
 autocmd FileType php setlocal expandtab tabstop=4 softtabstop=4 shiftwidth=4
-autocmd FileType yaml,slim,json,vim call SetShiftTwoSpaces()
+autocmd FileType javascript,yaml,slim,json,vim call SetShiftTwoSpaces()
 
 nmap <Leader><Space>2 :call SetShiftTwoSpaces()<CR>
 
