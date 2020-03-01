@@ -20,7 +20,7 @@ set autoread
 
 runtime macros/matchit.vim "Adds some magic in terms of quick navigation
 
-set backspace=indent,eol,start "Fixes backspace"
+set backspace=indent,eol,start "Fixes backspace
 
 set complete-=i
 
@@ -89,6 +89,8 @@ let mapleader = ','
 nmap \q :nohlsearch<CR>
 nmap \e :e#<CR>
 nmap \f :Ack<Space>
+
+nmap \<Space> :%s/\s\+$//e<CR>
 
 " Use the space key to toggle folds
 nnoremap <space> za
@@ -181,6 +183,9 @@ Plug 'mattn/emmet-vim'
 Plug 'sts10/vim-pink-moon'
 Plug 'aswathkk/DarkScene.vim'
 
+" Markdown support
+Plug 'gabrielelana/vim-markdown'
+
 call plug#end()
 
 " ---- PLUGINS CONFIGURATION ----"
@@ -231,14 +236,14 @@ augroup vimdiff
   autocmd VimEnter,FilterWritePre * if &diff | ALEDisable | endif
 augroup END
 
-" VIM RSPEC "
+" VIM RSPEC
 
 " Runs whole file
 map <Leader>s :call RunCurrentSpecFile()<CR>
+" Runs last spec
+map <Leader>S :call RunLastSpec()<CR>
 " Runs nearest spec in the whole file
 map <Leader><Space>s :call RunNearestSpec()<CR>
-" Runs last spec
-map <Leader>l :call RunLastSpec()<CR>
 
 let g:rspec_command = "Dispatch bundle exec rspec {spec}"
 
