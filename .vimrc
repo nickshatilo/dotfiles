@@ -185,6 +185,7 @@ Plug 'aswathkk/DarkScene.vim'
 
 " Markdown support
 Plug 'gabrielelana/vim-markdown'
+Plug 'JamshedVesuna/vim-markdown-preview'
 
 call plug#end()
 
@@ -229,7 +230,7 @@ highlight link ALEErrorSign Title
 nmap ]w :ALENextWrap<CR>
 nmap [w :ALEPreviousWrap<CR>
 
-let g:ale_fixers = {'ruby': ['rubocop'], 'xml': ['xmllint']}
+let g:ale_fixers = {'ruby': ['rubocop'], 'xml': ['xmllint'], 'json': ['jq']}
 
 augroup vimdiff
 	autocmd!
@@ -247,6 +248,10 @@ map <Leader><Space>s :call RunNearestSpec()<CR>
 
 let g:rspec_command = "Dispatch bundle exec rspec {spec}"
 
+" --- Markdown ---
+let vim_markdown_preview_github = 1
+let vim_markdown_preview_browser='Brave Browser'
+
 " --- TAGBAR ---
 
 nmap \b :TagbarToggle<CR>
@@ -254,7 +259,7 @@ nmap \b :TagbarToggle<CR>
 " --- LANGUAGE SPECIFIC CONFUGRATION --- "
 
 autocmd FileType php setlocal expandtab tabstop=4 softtabstop=4 shiftwidth=4
-autocmd FileType javascript,yaml,slim,json,vim call SetShiftTwoSpaces()
+autocmd FileType javascript,yaml,slim,json,vim,scss call SetShiftTwoSpaces()
 
 nmap <Leader><Space>2 :call SetShiftTwoSpaces()<CR>
 
