@@ -16,6 +16,8 @@ set nocompatible "Set nocompatible mode to stop pretending like it's vi"
 set wildmenu "Shows smart autocompletion whil
 set smarttab "Use shiftwidth number of spaces when doing tabs"
 
+set rnu " Relative line numbers
+
 set autoread
 
 runtime macros/matchit.vim "Adds some magic in terms of quick navigation
@@ -130,6 +132,9 @@ set termguicolors
 :highlight ExtraWhitespace ctermbg=red guibg=red
 :match ExtraWhitespace /\s\+$/
 
+" --- RELOAD MY VIM CONFIG --- 
+
+nnoremap <silent> <Leader><Leader> :source $MYVIMRC<cr>
 
 " ---- PLUGINS ----"
 
@@ -142,7 +147,7 @@ Plug 'vim-airline/vim-airline' " Bottom line magic
 Plug 'tpope/vim-surround'
 
 if has('macunix')
-	Plug '/usr/local/opt/fzf' " -- Fuzzy search --
+	Plug '/opt/homebrew/opt/fzf' " -- Fuzzy search --
 	Plug 'junegunn/fzf.vim'
 else
   Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
@@ -150,6 +155,8 @@ endif
       
 Plug 'mileszs/ack.vim', { 'on': 'Ack' }
 Plug 'tpope/vim-dispatch'
+
+Plug 'preservim/vimux'
     
 Plug 'vim-ruby/vim-ruby' "Extensive ruby support
 Plug 'tpope/vim-rails' "Rails magic
@@ -158,7 +165,7 @@ Plug 'tpope/vim-bundler' "Looks like it indices all of the gems ctags
 
 Plug 'thoughtbot/vim-rspec' "Run ruby specs
 
-Plug 'kana/vim-textobj-user'
+Plug 'kana/vim-textobj-user' "Textobject
 Plug 'nelstrom/vim-textobj-rubyblock'
 
 Plug 'slim-template/vim-slim' "Slim templating support
@@ -182,6 +189,7 @@ Plug 'mattn/emmet-vim'
 " Color schemes
 Plug 'sts10/vim-pink-moon'
 Plug 'aswathkk/DarkScene.vim'
+Plug 'ayu-theme/ayu-vim'
 
 " Markdown support
 Plug 'gabrielelana/vim-markdown'
@@ -191,7 +199,10 @@ call plug#end()
 
 " ---- PLUGINS CONFIGURATION ----"
 
-colorscheme darkscene
+let ayucolor="mirage" " for mirage version of theme
+
+" colorscheme darkscene
+colorscheme ayu
 
 " --- NERDTREE --- "
 
@@ -246,7 +257,7 @@ map <Leader>S :call RunLastSpec()<CR>
 " Runs nearest spec in the whole file
 map <Leader><Space>s :call RunNearestSpec()<CR>
 
-let g:rspec_command = "Dispatch bundle exec rspec {spec}"
+let g:rspec_command = "VimuxRunCommand 'bundle exec rspec {spec}'"
 
 " --- Markdown ---
 let vim_markdown_preview_github = 1
@@ -266,5 +277,4 @@ nmap <Leader><Space>2 :call SetShiftTwoSpaces()<CR>
 function SetShiftTwoSpaces()
   setlocal expandtab tabstop=2 softtabstop=2 shiftwidth=2
 endfunction
-
 
