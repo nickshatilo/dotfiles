@@ -134,6 +134,7 @@ set termguicolors
 
 " --- RELOAD MY VIM CONFIG --- 
 
+nnoremap <silent> m<Leader><Leader> :edit $MYVIMRC<cr>
 nnoremap <silent> <Leader><Leader> :source $MYVIMRC<cr>
 
 " ---- PLUGINS ----"
@@ -154,9 +155,9 @@ else
 endif
       
 Plug 'mileszs/ack.vim', { 'on': 'Ack' }
-Plug 'tpope/vim-dispatch'
+Plug 'tpope/vim-dispatch' " Ability to dispatch commands
 
-Plug 'preservim/vimux'
+Plug 'preservim/vimux' " Tmux integration
     
 Plug 'vim-ruby/vim-ruby' "Extensive ruby support
 Plug 'tpope/vim-rails' "Rails magic
@@ -167,6 +168,10 @@ Plug 'thoughtbot/vim-rspec' "Run ruby specs
 
 Plug 'kana/vim-textobj-user' "Textobject
 Plug 'nelstrom/vim-textobj-rubyblock'
+
+Plug 'moll/vim-node'
+Plug 'tomlion/vim-solidity'
+Plug 'leafgarland/typescript-vim'
 
 Plug 'slim-template/vim-slim' "Slim templating support
 
@@ -195,7 +200,19 @@ Plug 'ayu-theme/ayu-vim'
 Plug 'gabrielelana/vim-markdown'
 Plug 'JamshedVesuna/vim-markdown-preview'
 
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+
+Plug 'vim-test/vim-test'
+Plug 'rcarriga/vim-ultest', { 'do': ':UpdateRemotePlugins' }
+
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+
+
+Plug 'autozimu/LanguageClient-neovim', { 'do': 'bash install.sh' }
+
+
 call plug#end()
+
 
 " ---- PLUGINS CONFIGURATION ----"
 
@@ -241,21 +258,45 @@ highlight link ALEErrorSign Title
 nmap ]w :ALENextWrap<CR>
 nmap [w :ALEPreviousWrap<CR>
 
-let g:ale_fixers = {'ruby': ['rubocop'], 'xml': ['xmllint'], 'json': ['jq']}
+let g:ale_fixers = {'ruby': ['rubocop'], 'xml': ['xmllint'], 'json': ['jq'], 'javascript': ['eslint'], 'typescript': ['eslint']}
 
 augroup vimdiff
 	autocmd!
   autocmd VimEnter,FilterWritePre * if &diff | ALEDisable | endif
 augroup END
 
-" VIM RSPEC
+" --- Deoplete (autocompletion) ---
+let g:deoplete#enable_at_startup = 1
+
+call deoplete#custom#source('LanguageClient',
+            \ 'min_pattern_length',
+            \ 2)
+
+
+" --- VIM TESTS ---
 
 " Runs whole file
-map <Leader>s :call RunCurrentSpecFile()<CR>
+nmap <silent> <leader>s :TestNearest<CR>
+
+" let test#strategy = "dispatch"
+let g:test#javascript#runner = 'mocha'
+
+let test#javascript#mocha#options = "APP_ENV=test"
+
 " Runs last spec
-map <Leader>S :call RunLastSpec()<CR>
+" map <Leader>S :call RunLastSpec()<CR>
 " Runs nearest spec in the whole file
-map <Leader><Space>s :call RunNearestSpec()<CR>
+" map <Leader><Space>s :call RunNearestSpec()<CR>
+
+
+" " VIM RSPEC
+
+" " Runs whole file
+" map <Leader>s :call RunCurrentSpecFile()<CR>
+" " Runs last spec
+" map <Leader>S :call RunLastSpec()<CR>
+" " Runs nearest spec in the whole file
+" map <Leader><Space>s :call RunNearestSpec()<CR>
 
 let g:rspec_command = "VimuxRunCommand 'bundle exec rspec {spec}'"
 
@@ -267,14 +308,101 @@ let vim_markdown_preview_browser='Brave Browser'
 
 nmap \b :TagbarToggle<CR>
 
+" --- LANGUAGE CLIENT  ---
+
+" TODO: add solidity ?
+let g:LanguageClient_serverCommands = { 'ruby': ['~/.rbenv/shims/solargraph', 'stdio'],
+        \'typescript': ['/Users/nick/.nodenv/shims/typescript-language-server', '--stdio'],
+        \'javascript': ['/Users/nick/.nodenv/shims/typescript-language-server', '--stdio'],
+        \}
+
+" Awesome mappings for LanguageClient
+nnoremap <leader>ld :call LanguageClient#textDocument_definition()<CR>
+nnoremap <leader>lr :call LanguageClient#textDocument_rename()<CR>
+nnoremap <leader>lf :call LanguageClient#textDocument_formatting()<CR>
+nnoremap <leader>lt :call LanguageClient#textDocument_typeDefinition()<CR>
+
+nnoremap <leader>lx :call LanguageClient#textDocument_references()<CR>
+nnoremap <leader>lX :call OpenLanguageClientSelectionUIQuickFix()<CR>
+
+nnoremap <leader>la :call LanguageClient_workspace_applyEdit()<CR>
+nnoremap <leader>lc :call LanguageClient#textDocument_completion()<CR>
+nnoremap <leader>lh :call LanguageClient#textDocument_hover()<CR>
+nnoremap <leader>ls :call LanguageClient_textDocument_documentSymbol()<CR>
+nnoremap <leader>lm :call LanguageClient_contextMenu()<CR>
+
+let g:LanguageClient_diagnosticsList='Disabled'
+
+"  Probably there is a better way for all of this. "
+let g:useQuickFixForCustomLanagueClientSelectionUI=0
+
+" Adds ability to search references both in quickfix and fzf window
+function! CustomLanguageClientSelectionUI(source, sink) abort
+  if g:useQuickFixForCustomLanagueClientSelectionUI
+    cexpr a:source
+    copen
+  else
+    if exists('*fzf#vim#with_preview')
+      let l:options = fzf#vim#with_preview('right:50%:hidden', '?').options
+    else
+      let l:options = []
+    endif
+
+    call fzf#run(fzf#wrap({
+          \ 'source': a:source,
+          \ 'sink': function(a:sink),
+          \ 'options': l:options,
+          \ }))
+
+    if has('nvim') && !has('nvim-0.4')
+      call feedkeys('i')
+    endif
+  endif
+
+  let g:useQuickFixForCustomLanagueClientSelectionUI=0
+endfunction
+
+let g:LanguageClient_selectionUI = function('CustomLanguageClientSelectionUI')
+
+function OpenLanguageClientSelectionUIQuickFix() 
+  let g:useQuickFixForCustomLanagueClientSelectionUI=1
+  call LanguageClient#textDocument_references()
+endfunction
+
+" --- Tree Sitter (Advanced highlighting)
+
+lua <<EOF
+require'nvim-treesitter.configs'.setup {
+  ensure_installed = { "typescript", "javascript", "ruby" },
+  sync_install = true,
+  highlight = {
+    enable = true,
+    additional_vim_regex_highlighting = false,
+  },
+  indent = {
+    enable = false,
+  },
+  incremental_selection = {
+    enable = true,
+    keymaps = {
+      init_selection = "gnn",
+      node_incremental = "grn",
+      scope_incremental = "grc",
+      node_decremental = "grm",
+    }
+  }
+}
+EOF
+
 " --- LANGUAGE SPECIFIC CONFUGRATION --- "
 
-autocmd FileType php setlocal expandtab tabstop=4 softtabstop=4 shiftwidth=4
-autocmd FileType javascript,yaml,slim,json,vim,scss call SetShiftTwoSpaces()
+autocmd FileType php,solidity setlocal expandtab tabstop=4 softtabstop=4 shiftwidth=4
+autocmd FileType typescript,javascript,yaml,slim,json,vim,scss call SetShiftTwoSpaces()
 
 nmap <Leader><Space>2 :call SetShiftTwoSpaces()<CR>
 
 function SetShiftTwoSpaces()
   setlocal expandtab tabstop=2 softtabstop=2 shiftwidth=2
 endfunction
+
 
