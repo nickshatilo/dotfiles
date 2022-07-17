@@ -160,11 +160,11 @@ Plug 'tpope/vim-dispatch' " Ability to dispatch commands
 Plug 'preservim/vimux' " Tmux integration
     
 Plug 'vim-ruby/vim-ruby' "Extensive ruby support
-Plug 'tpope/vim-rails' "Rails magic
-Plug 'tpope/vim-rbenv' "Load tags only for current ruby version
-Plug 'tpope/vim-bundler' "Looks like it indices all of the gems ctags
+" Plug 'tpope/vim-rails' "Rails magic
+" Plug 'tpope/vim-rbenv' "Load tags only for current ruby version
+" Plug 'tpope/vim-bundler' "Looks like it indices all of the gems ctags
 
-Plug 'thoughtbot/vim-rspec' "Run ruby specs
+" Plug 'thoughtbot/vim-rspec' "Run ruby specs
 
 Plug 'kana/vim-textobj-user' "Textobject
 Plug 'nelstrom/vim-textobj-rubyblock'
@@ -202,14 +202,13 @@ Plug 'JamshedVesuna/vim-markdown-preview'
 
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
-Plug 'vim-test/vim-test'
-Plug 'rcarriga/vim-ultest', { 'do': ':UpdateRemotePlugins' }
-
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+Plug 'deoplete-plugins/deoplete-lsp'
 
+Plug 'junegunn/vim-peekaboo'
 
-Plug 'autozimu/LanguageClient-neovim', { 'do': 'bash install.sh' }
-
+Plug 'neovim/nvim-lspconfig'
+Plug 'tpope/vim-projectionist'
 
 call plug#end()
 
@@ -258,6 +257,10 @@ highlight link ALEErrorSign Title
 nmap ]w :ALENextWrap<CR>
 nmap [w :ALEPreviousWrap<CR>
 
+let g:ale_linters_ignore = {
+      \   'solidity': ['solc'],
+      \}
+
 let g:ale_fixers = {'ruby': ['rubocop'], 'xml': ['xmllint'], 'json': ['jq'], 'javascript': ['eslint'], 'typescript': ['eslint']}
 
 augroup vimdiff
@@ -267,13 +270,10 @@ augroup END
 
 " --- Deoplete (autocompletion) ---
 let g:deoplete#enable_at_startup = 1
+let g:deoplete#lsp#use_icons_for_candidates = v:true
+let g:deoplete#lsp#handler_enabled = v:true
 
-call deoplete#custom#source('LanguageClient',
-            \ 'min_pattern_length',
-            \ 2)
-
-
-" --- VIM TESTS ---
+" --- VIM TESTS --- (WIP)
 
 " Runs whole file
 nmap <silent> <leader>s :TestNearest<CR>
@@ -308,66 +308,59 @@ let vim_markdown_preview_browser='Brave Browser'
 
 nmap \b :TagbarToggle<CR>
 
-" --- LANGUAGE CLIENT  ---
+" --- LSP CONFIG --- "
 
-" TODO: add solidity ?
-let g:LanguageClient_serverCommands = { 'ruby': ['~/.rbenv/shims/solargraph', 'stdio'],
-        \'typescript': ['/Users/nick/.nodenv/shims/typescript-language-server', '--stdio'],
-        \'javascript': ['/Users/nick/.nodenv/shims/typescript-language-server', '--stdio'],
-        \}
+lua <<EOF
 
-" Awesome mappings for LanguageClient
-nnoremap <leader>ld :call LanguageClient#textDocument_definition()<CR>
-nnoremap <leader>lr :call LanguageClient#textDocument_rename()<CR>
-nnoremap <leader>lf :call LanguageClient#textDocument_formatting()<CR>
-nnoremap <leader>lt :call LanguageClient#textDocument_typeDefinition()<CR>
+local opts = { noremap=true, silent=true }
+local util = require 'lspconfig.util'
 
-nnoremap <leader>lx :call LanguageClient#textDocument_references()<CR>
-nnoremap <leader>lX :call OpenLanguageClientSelectionUIQuickFix()<CR>
+-- Linter jumps and magic
+vim.api.nvim_set_keymap('n', '<space>e', '<cmd>lua vim.diagnostic.open_float()<CR>', opts)
+vim.api.nvim_set_keymap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<CR>', opts)
+vim.api.nvim_set_keymap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<CR>', opts)
+vim.api.nvim_set_keymap('n', '<space>q', '<cmd>lua vim.diagnostic.setloclist()<CR>', opts)
 
-nnoremap <leader>la :call LanguageClient_workspace_applyEdit()<CR>
-nnoremap <leader>lc :call LanguageClient#textDocument_completion()<CR>
-nnoremap <leader>lh :call LanguageClient#textDocument_hover()<CR>
-nnoremap <leader>ls :call LanguageClient_textDocument_documentSymbol()<CR>
-nnoremap <leader>lm :call LanguageClient_contextMenu()<CR>
+-- Mappings.
+local on_attach = function(client, bufnr)
+  -- Jumps
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', opts)
 
-let g:LanguageClient_diagnosticsList='Disabled'
+  -- References - Implementation searches
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
 
-"  Probably there is a better way for all of this. "
-let g:useQuickFixForCustomLanagueClientSelectionUI=0
+  -- Workspace folders
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
 
-" Adds ability to search references both in quickfix and fzf window
-function! CustomLanguageClientSelectionUI(source, sink) abort
-  if g:useQuickFixForCustomLanagueClientSelectionUI
-    cexpr a:source
-    copen
-  else
-    if exists('*fzf#vim#with_preview')
-      let l:options = fzf#vim#with_preview('right:50%:hidden', '?').options
-    else
-      let l:options = []
-    endif
+  -- Hover magic
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', opts)
 
-    call fzf#run(fzf#wrap({
-          \ 'source': a:source,
-          \ 'sink': function(a:sink),
-          \ 'options': l:options,
-          \ }))
+  -- Rename
+  vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+end
 
-    if has('nvim') && !has('nvim-0.4')
-      call feedkeys('i')
-    endif
-  endif
+-- Use a loop to conveniently call 'setup' on multiple servers and
+-- map buffer local keybindings when the language server attaches
+local servers = { 'tsserver'}
+for _, lsp in pairs(servers) do
+  require('lspconfig')[lsp].setup {
+    on_attach = on_attach
+  }
+end
 
-  let g:useQuickFixForCustomLanagueClientSelectionUI=0
-endfunction
-
-let g:LanguageClient_selectionUI = function('CustomLanguageClientSelectionUI')
-
-function OpenLanguageClientSelectionUIQuickFix() 
-  let g:useQuickFixForCustomLanagueClientSelectionUI=1
-  call LanguageClient#textDocument_references()
-endfunction
+require('lspconfig')['solc'].setup {
+  on_attach = on_attach,
+  cmd = {"solc", "--lsp"},
+  root_dir = util.root_pattern(
+  '.git'
+  ),
+}
+--
+EOF
 
 " --- Tree Sitter (Advanced highlighting)
 
