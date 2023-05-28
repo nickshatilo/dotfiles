@@ -35,6 +35,9 @@ api.nvim_set_keymap('v', 'K', ":m '<-2<CR>gv=gv", {})
 g.loaded_netrw = 1
 g.loaded_netrwPlugin = 1
 
+-- Editorconfig
+vim.g.editorconfig = true
+
 -- Search unhighlighting
 api.nvim_set_keymap('n', '\\q', ':nohlsearch<CR>', {})
 
@@ -67,6 +70,9 @@ api.nvim_set_keymap('n', '<Leader><Leader>', ':luafile $MYVIMRC<CR>', silent_nor
 
 -- Open git
 api.nvim_set_keymap('n', '<Leader>g', ':Git<CR>', silent_noremap_opts)
+
+-- Smart paste
+api.nvim_set_keymap('n', '<Leader>p', "\"_dp", silent_noremap_opts)
 
 -- Undotree
 api.nvim_set_keymap('n', '<Leader>u', ':UndotreeToggle<CR>', silent_noremap_opts)
@@ -130,11 +136,6 @@ require('packer').startup(function(use)
     }
 
     use {
-        'nmac427/guess-indent.nvim',
-        config = function() require('guess-indent').setup {} end,
-    }
-
-    use {
         'akinsho/bufferline.nvim',
         tag = "v3.*",
         requires = 'nvim-tree/nvim-web-devicons'
@@ -184,12 +185,19 @@ require('packer').startup(function(use)
     -- Tree sitter
     use {
         'nvim-treesitter/nvim-treesitter',
-        run = ':TSUpdate'
+        -- config = function () 
+        --     vim.api.cmd ':TSUpdate'
+        -- end
     }
 
     -- GIT
 
-    use 'tpope/vim-fugitive'
+    use {  
+        'tpope/vim-fugitive',
+        requires = {
+            'tpope/vim-dispatch'
+        }
+    }
     use 'tpope/vim-rhubarb'
 
 
@@ -216,6 +224,12 @@ require('packer').startup(function(use)
     -- use {
     --     'f-person/auto-dark-mode.nvim'
     -- }
+
+    use { 'mhartington/formatter.nvim' }
+
+    use 'vim-scripts/BufOnly.vim'
+    
+    use 'shuntaka9576/preview-swagger.nvim'
 
     -- Automatically set up your configuration after cloning packer.nvim
     -- Put this at the end after all plugins
@@ -317,9 +331,11 @@ local telescope_builtin = require('telescope.builtin')
 
 keymap.set('n', '<leader>t', telescope_builtin.find_files, {})
 
+keymap.set('n', '<leader>r', telescope_builtin.lsp_workspace_symbols, {})
+
 keymap.set('n', '\\f', telescope_builtin.live_grep, {})
 keymap.set('n', '\\F', telescope_builtin.git_files, {})
-keymap.set('n', ';', telescope_builtin.buffers, {})
+-- keymap.set('n', ';', telescope_builtin.buffers, {})
 
 -- LSP SETUP
 
@@ -340,6 +356,7 @@ lsp.ensure_installed({
 lsp.on_attach(function(_, bufnr)
     -- Jumps
     api.nvim_buf_set_keymap(bufnr, 'n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', silent_noremap_opts)
+
     api.nvim_buf_set_keymap(bufnr, 'n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', silent_noremap_opts)
 
     -- References - Implementation searches
@@ -374,8 +391,8 @@ lsp.on_attach(function(_, bufnr)
 
     api.nvim_buf_set_keymap(bufnr, 'n', '<space>q', '<cmd>lua vim.diagnostic.setloclist()<CR>', silent_noremap_opts)
 
-    api.nvim_buf_set_keymap(bufnr, 'n', '<Leader>f', '<cmd>lua vim.lsp.buf.format { async = true }<CR>',
-        silent_noremap_opts)
+    -- api.nvim_buf_set_keymap(bufnr, 'n', '<Leader>f', '<cmd>lua vim.lsp.buf.format { async = true }<CR>',
+    --     silent_noremap_opts)
 end)
 
 -- Enables neovim config to properly use lua auto-completion
@@ -420,3 +437,21 @@ require 'nvim-treesitter.configs'.setup {
         enable = true
     }
 }
+
+-- Autoformatter
+
+-- Provides the Format, FormatWrite, FormatLock, and FormatWriteLock commands
+-- require('formatter').setup {
+--     filetype = {
+--         typescript = {
+--             require('formatter.filetypes.typescript').eslint_d
+--         },
+--         -- Use the special "*" filetype for defining formatter configurations on
+--         -- any filetype
+--         ["*"] = {
+--             -- "formatter.filetypes.any" defines default configurations for any
+--             -- filetype
+--             require('formatter.filetypes.any').remove_trailing_whitespace
+--         }
+--     }
+-- }
