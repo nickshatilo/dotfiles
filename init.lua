@@ -191,7 +191,6 @@ require('packer').startup(function(use)
     }
 
     -- GIT
-
     use {  
         'tpope/vim-fugitive',
         requires = {
@@ -199,6 +198,9 @@ require('packer').startup(function(use)
         }
     }
     use 'tpope/vim-rhubarb'
+    use {
+	'lewis6991/gitsigns.nvim'
+    }
 
 
     -- Bufferline
@@ -219,12 +221,6 @@ require('packer').startup(function(use)
 
     use 'tpope/vim-projectionist'
 
-    -- Auto night mode
-
-    -- use {
-    --     'f-person/auto-dark-mode.nvim'
-    -- }
-
     use { 'mhartington/formatter.nvim' }
 
     use 'vim-scripts/BufOnly.vim'
@@ -238,6 +234,8 @@ require('packer').startup(function(use)
     end
 end)
 
+require('gitsigns').setup() -- Enables git signs
+
 -- THEME SETUP
 
 
@@ -247,26 +245,6 @@ vim.cmd 'colorscheme onedarker'
 lualine.setup {
     options = { theme = 'nightfly' }
 }
-
--- local auto_dark_mode = require('auto-dark-mode')
-
--- auto_dark_mode.setup({
--- 	set_dark_mode = function()
---         vim.cmd 'colorscheme onedarker'
---         lualine.setup {
---             options = { theme = 'nightfly' }
---         }
--- 	end,
--- 	set_light_mode = function()
--- 		vim.cmd('colorscheme gruvbox')
---         lualine.setup {
---             options = { theme = 'gruvbox' }
---         }
--- 	end,
--- })
--- auto_dark_mode.init()
-
-
 
 
 -- NVIM TREE SETUP
@@ -438,6 +416,7 @@ require 'nvim-treesitter.configs'.setup {
     }
 }
 
+
 -- Autoformatter
 
 -- Provides the Format, FormatWrite, FormatLock, and FormatWriteLock commands
@@ -455,3 +434,4 @@ require 'nvim-treesitter.configs'.setup {
 --         }
 --     }
 -- }
+
