@@ -7,8 +7,6 @@ local keymap = vim.keymap
 
 opt.ignorecase = true
 opt.smartcase = true
--- opt.
-
 
 opt.smarttab = true
 opt.smartindent = true
@@ -59,6 +57,7 @@ api.nvim_set_keymap('', '<Leader>X', ':hide!<CR>', silent_noremap_opts)
 
 -- Focus current split
 api.nvim_set_keymap('', '<Leader>O', ':only<CR>', silent_noremap_opts)
+api.nvim_set_keymap('', '<Leader><Leader>O', ':BufOnly<CR>', silent_noremap_opts)
 
 -- Edit VIM config
 api.nvim_set_keymap('n', 'm<Leader><Leader>', ':edit $MYVIMRC<CR>', silent_noremap_opts)
@@ -144,6 +143,9 @@ require('packer').startup(function(use)
     use {
         'tpope/vim-surround'
     }
+    use {
+        'tpope/vim-abolish'
+    }
 
     -- Searches
     use {
@@ -153,7 +155,8 @@ require('packer').startup(function(use)
     }
     use {
         'nvim-telescope/telescope-fzf-native.nvim',
-        run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'
+        run =
+        'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'
     }
 
     -- LSP
@@ -161,23 +164,24 @@ require('packer').startup(function(use)
 
     use {
         'VonHeikemen/lsp-zero.nvim',
-        branch = 'v1.x',
+        branch = 'v2.x',
         requires = {
             -- LSP Support
-            { 'neovim/nvim-lspconfig' }, -- Required
-            { 'williamboman/mason.nvim' }, -- Optional
+            { 'neovim/nvim-lspconfig' },             -- Required
+            { 'williamboman/mason.nvim' },           -- Optional
             { 'williamboman/mason-lspconfig.nvim' }, -- Optional
 
             -- Autocompletion
-            { 'hrsh7th/nvim-cmp' }, -- Required
-            { 'hrsh7th/cmp-nvim-lsp' }, -- Required
-            { 'hrsh7th/cmp-buffer' }, -- Optional
-            { 'hrsh7th/cmp-path' }, -- Optional
+            { 'hrsh7th/nvim-cmp' },         -- Required
+            { 'hrsh7th/cmp-nvim-lsp' },     -- Required
+            { 'hrsh7th/cmp-buffer' },       -- Optional
+            { 'hrsh7th/cmp-path' },         -- Optional
             { 'saadparwaiz1/cmp_luasnip' }, -- Optional
-            { 'hrsh7th/cmp-nvim-lua' }, -- Optional
+            { 'hrsh7th/cmp-nvim-lua' },     -- Optional
+            { 'zbirenbaum/copilot-cmp' },
 
             -- Snippets
-            { 'L3MON4D3/LuaSnip' }, -- Required
+            { 'L3MON4D3/LuaSnip' },             -- Required
             { 'rafamadriz/friendly-snippets' }, -- Optional
         }
     }
@@ -189,7 +193,7 @@ require('packer').startup(function(use)
     }
 
     -- GIT
-    use {  
+    use {
         'tpope/vim-fugitive',
         requires = {
             'tpope/vim-dispatch'
@@ -197,7 +201,7 @@ require('packer').startup(function(use)
     }
     use 'tpope/vim-rhubarb'
     use {
-	'lewis6991/gitsigns.nvim'
+        'lewis6991/gitsigns.nvim'
     }
 
 
@@ -220,7 +224,16 @@ require('packer').startup(function(use)
     use 'tpope/vim-projectionist'
 
     use 'vim-scripts/BufOnly.vim'
-    
+
+    use { "akinsho/toggleterm.nvim", tag = '*', config = function()
+        require("toggleterm").setup()
+    end }
+
+    -- Copilot
+
+    use { "zbirenbaum/copilot.lua" }
+
+
     -- Automatically set up your configuration after cloning packer.nvim
     -- Put this at the end after all plugins
     if packer_bootstrap then
@@ -243,7 +256,18 @@ lualine.setup {
 
 -- NVIM TREE SETUP
 
-require('nvim-tree').setup()
+require('nvim-tree').setup({
+    filters = {
+        git_ignored = false,
+        dotfiles = false,
+        git_clean = false,
+        no_buffer = false
+    }
+})
+
+vim.api.nvim_create_autocmd({ "QuitPre" }, {
+    callback = function() vim.cmd("NvimTreeClose") end,
+})
 
 api.nvim_set_keymap('', '<Leader>n', ':NvimTreeToggle<CR>', silent_noremap_opts)
 api.nvim_set_keymap('', '<Leader><Space>n', ':NvimTreeFindFileToggle<CR>', silent_noremap_opts)
@@ -305,23 +329,11 @@ keymap.set('n', '<leader>t', telescope_builtin.find_files, {})
 
 keymap.set('n', '\\f', telescope_builtin.live_grep, {})
 keymap.set('n', '\\F', telescope_builtin.git_files, {})
-keymap.set('n', ';', telescope_builtin.buffers, {})
+keymap.set('n', '\\b', telescope_builtin.buffers, {})
 
 -- LSP SETUP
 
-local lsp = require('lsp-zero')
-
-lsp.preset({
-    name = 'minimal',
-    set_lsp_keymaps = false,
-    manage_nvim_cmp = true,
-    suggest_lsp_servers = true,
-})
-
-lsp.ensure_installed({
-    'tsserver',
-    -- 'eslint',
-})
+local lsp = require('lsp-zero').preset({})
 
 lsp.on_attach(function(_, bufnr)
     -- Jumps
@@ -365,22 +377,117 @@ lsp.on_attach(function(_, bufnr)
 end)
 
 -- Enables neovim config to properly use lua auto-completion
-lsp.nvim_workspace({
-    library = vim.api.nvim_get_runtime_file('', true)
-})
+require('lspconfig').lua_ls.setup(lsp.nvim_lua_ls())
 
 lsp.setup()
 
--- Shows errors as virtual text
+lsp.set_sign_icons({
+    error = '✘',
+    warn = '▲',
+    hint = '⚑',
+    info = ''
+})
+
 vim.diagnostic.config({
-    virtual_text = true,
+    virtual_text = false,
+    severity_sort = true,
+    float = {
+        style = 'minimal',
+        border = 'rounded',
+        source = 'always',
+        header = '',
+        prefix = '',
+    },
+})
+
+lsp.ensure_installed({
+    'tsserver',
+})
+
+-- CMP
+
+local cmp = require('cmp')
+local cmp_action = require('lsp-zero.cmp').action()
+
+require('luasnip.loaders.from_vscode').lazy_load()
+
+vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
+
+local has_words_before = function()
+    if vim.api.nvim_buf_get_option(0, "buftype") == "prompt" then return false end
+    local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+    return col ~= 0 and vim.api.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]:match("^%s*$") == nil
+end
+
+cmp.setup({
+    preselect = 'item',
+    completion = {
+        completeopt = 'menu,menuone,noinsert'
+    },
+    window = {
+        documention = cmp.config.window.bordered(),
+    },
+    sources = {
+        { name = 'copilot',  group_index = 2 },
+
+        { name = 'path',     group_index = 2 },
+        { name = 'buffer',   group_index = 2, keyword_length = 3 },
+
+        { name = 'nvim_lsp', group_index = 2 },
+        { name = 'nvim_lua', group_index = 2 },
+
+        { name = 'luasnip',  group_index = 2, keyword_length = 2 },
+    },
+    mapping = {
+        -- confirm completion item
+        ['<CR>'] = cmp.mapping.confirm({ select = false }),
+
+        -- toggle completion menu
+        ['<C-a>'] = cmp_action.toggle_completion(),
+
+        -- tab complete
+        ['<Tab>'] = vim.schedule_wrap(function(fallback)
+            if cmp.visible() and has_words_before() then
+                cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+            else
+                fallback()
+            end
+        end),
+        ['<S-Tab>'] = cmp.mapping.select_prev_item(),
+
+        -- navigate between snippet placeholder
+        ['<C-d>'] = cmp_action.luasnip_jump_forward(),
+        ['<C-b>'] = cmp_action.luasnip_jump_backward(),
+
+        -- scroll documention window
+        ['<C-f>'] = cmp.mapping.scroll_docs(5),
+        ['<C-u>'] = cmp.mapping.scroll_docs(-5),
+    },
+    sorting = {
+        priority_weight = 2,
+        comparators = {
+            require("copilot_cmp.comparators").prioritize,
+
+            -- Below is the default comparitor list and order for nvim-cmp
+            cmp.config.compare.offset,
+            -- cmp.config.compare.scopes, --this is commented in nvim-cmp too
+            cmp.config.compare.exact,
+            cmp.config.compare.score,
+            cmp.config.compare.recently_used,
+            cmp.config.compare.locality,
+            cmp.config.compare.kind,
+            cmp.config.compare.sort_text,
+            cmp.config.compare.length,
+            cmp.config.compare.order,
+        },
+    },
 })
 
 -- TREESITTER
 
 require 'nvim-treesitter.configs'.setup {
     -- A list of parser names, or "all" (the four listed parsers should always be installed)
-    ensure_installed = { "lua", "vim", "help", "javascript", "typescript", "solidity" },
+    ensure_installed = { "lua", "vim", "help", "javascript", "typescript", "solidity", "terraform" },
 
     -- Install parsers synchronously (only applied to `ensure_installed`)
     sync_install = true,
@@ -406,3 +513,12 @@ require 'nvim-treesitter.configs'.setup {
         enable = true
     }
 }
+
+-- Copilot
+
+require("copilot_cmp").setup()
+
+require("copilot").setup({
+    suggestion = { enabled = false },
+    panel = { enabled = false },
+})
