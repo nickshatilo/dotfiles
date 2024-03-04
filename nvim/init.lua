@@ -57,7 +57,7 @@ api.nvim_set_keymap('', '<Leader>X', ':hide!<CR>', silent_noremap_opts)
 
 -- Focus current split
 api.nvim_set_keymap('', '<Leader>O', ':only<CR>', silent_noremap_opts)
-api.nvim_set_keymap('', '<Leader><Leader>O', ':BufOnly<CR>', silent_noremap_opts)
+api.nvim_set_keymap('', '<Leader><Leader>O', ':BufOnly!<CR>', silent_noremap_opts)
 
 -- Edit VIM config
 api.nvim_set_keymap('n', 'm<Leader><Leader>', ':edit $MYVIMRC<CR>', silent_noremap_opts)
@@ -130,6 +130,19 @@ require('packer').startup(function(use)
     }
 
     use {
+        'echasnovski/mini.ai',
+        config = function()
+            require('mini.ai').setup()
+        end
+    }
+
+    -- use {
+    --     'echasnovski/mini.move',
+    --     config = function()
+    --     end
+    -- }
+
+    use {
         'nmac427/guess-indent.nvim',
         config = function() require('guess-indent').setup {} end,
     }
@@ -149,9 +162,11 @@ require('packer').startup(function(use)
 
     -- Searches
     use {
-        'nvim-telescope/telescope.nvim', tag = '0.1.1',
-        -- or                            , branch = '0.1.x',
-        requires = { { 'nvim-lua/plenary.nvim' }, { 'BurntSushi/ripgrep' } }
+        'nvim-telescope/telescope.nvim', tag = '0.1.x',
+        requires = {
+            'nvim-lua/plenary.nvim' ,
+            'BurntSushi/ripgrep',
+        }
     }
     use {
         'nvim-telescope/telescope-fzf-native.nvim',
@@ -189,6 +204,7 @@ require('packer').startup(function(use)
     -- Tree sitter
     use {
         'nvim-treesitter/nvim-treesitter',
+        tag = 'v0.9.1',
         run = ':TSUpdate'
     }
 
@@ -209,8 +225,6 @@ require('packer').startup(function(use)
     use {
         'nvim-lualine/lualine.nvim',
         requires = { 'kyazdani42/nvim-web-devicons', opt = true },
-        config = function()
-        end
     }
 
     -- Undotree
@@ -241,7 +255,48 @@ require('packer').startup(function(use)
     end
 end)
 
-require('gitsigns').setup() -- Enables git signs
+require('gitsigns').setup({
+    on_attach = function(bufnr)
+        local gs = package.loaded.gitsigns
+
+        local function map(mode, l, r, opts)
+            opts = opts or {}
+            opts.buffer = bufnr
+            vim.keymap.set(mode, l, r, opts)
+        end
+
+        -- Navigation
+        map('n', ']c', function()
+            if vim.wo.diff then return ']c' end
+            vim.schedule(function() gs.next_hunk() end)
+            return '<Ignore>'
+        end, {expr=true})
+
+        map('n', '[c', function()
+            if vim.wo.diff then return '[c' end
+            vim.schedule(function() gs.prev_hunk() end)
+            return '<Ignore>'
+        end, {expr=true})
+
+        -- Actions
+        map('n', '<leader>hs', gs.stage_hunk)
+        map('n', '<leader>hr', gs.reset_hunk)
+        map('v', '<leader>hs', function() gs.stage_hunk {vim.fn.line('.'), vim.fn.line('v')} end)
+        map('v', '<leader>hr', function() gs.reset_hunk {vim.fn.line('.'), vim.fn.line('v')} end)
+        map('n', '<leader>hS', gs.stage_buffer)
+        map('n', '<leader>hu', gs.undo_stage_hunk)
+        map('n', '<leader>hR', gs.reset_buffer)
+        map('n', '<leader>hp', gs.preview_hunk)
+        map('n', '<leader>hb', function() gs.blame_line{full=true} end)
+        map('n', '<leader>tb', gs.toggle_current_line_blame)
+        map('n', '<leader>hd', gs.diffthis)
+        map('n', '<leader>hD', function() gs.diffthis('~') end)
+        map('n', '<leader>td', gs.toggle_deleted)
+
+        -- Text object
+        map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
+    end
+}) -- Enables git signs
 
 -- THEME SETUP
 
@@ -250,7 +305,15 @@ local lualine = require('lualine')
 
 vim.cmd 'colorscheme onedarker'
 lualine.setup {
-    options = { theme = 'nightfly' }
+    options = { theme = 'nightfly' },
+    sections = {
+        lualine_a = {'mode'},
+        lualine_b = {'branch', 'diff', 'diagnostics'},
+        lualine_c = {'filename'},
+        lualine_x = {'encoding', 'fileformat', 'filetype'},
+        lualine_y = {'progress'},
+        lualine_z = {'location'}
+    }
 }
 
 
@@ -320,16 +383,72 @@ require('telescope').setup {
             }
         }
     },
-
 }
 
 local telescope_builtin = require('telescope.builtin')
 
 keymap.set('n', '<leader>t', telescope_builtin.find_files, {})
+keymap.set('n', '<leader>sh', telescope_builtin.help_tags, {})
+keymap.set('n', '<leader>sr', telescope_builtin.resume, {})
 
 keymap.set('n', '\\f', telescope_builtin.live_grep, {})
 keymap.set('n', '\\F', telescope_builtin.git_files, {})
 keymap.set('n', '\\b', telescope_builtin.buffers, {})
+
+local actions = require('telescope.actions')
+local finders = require('telescope.finders')
+local pickers = require('telescope.pickers')
+local conf = require('telescope.config').values
+local entry_display = require('telescope.pickers.entry_display')
+
+-- Doesn't work, but is nice
+local function quickfix_with_regex()
+    local qf_list = vim.fn.getqflist()
+    local displayer = entry_display.create {
+        separator = " ",
+        items = {
+            { width = 30 }, -- Width for the filename
+            { remaining = true }, -- Remaining width for the content
+        },
+    }
+    local make_display = function(entry)
+        local filename = vim.fn.bufname(entry.value.bufnr) -- Get filename using bufnr
+        return displayer {
+            filename,
+            entry.value.text,
+        }
+    end
+    pickers.new({}, {
+        prompt_title = 'Quickfix with Filename and Content',
+        finder = finders.new_table {
+            results = qf_list,
+            entry_maker = function(entry)
+                return {
+                    value = entry,
+                    display = make_display,
+                    ordinal = vim.fn.bufname(entry.bufnr) .. ' ' .. entry.text,
+                }
+            end,
+        },
+        sorter = conf.generic_sorter({}),
+        attach_mappings = function(prompt_bufnr, map)
+            actions.select_default:replace(function()
+                local selection = actions.get_selected_entry()
+                actions.close(prompt_bufnr)
+                vim.api.nvim_win_set_cursor(0, {selection.value.lnum, 0})
+                vim.api.nvim_command('normal zz')
+            end)
+            return true
+        end,
+    }):find()
+end
+
+-- Map the function to a command or a keybinding
+keymap.set('n', '<Leader>qq', telescope_builtin.quickfix, {})
+
+keymap.set('n', '<Leader>qh', telescope_builtin.quickfixhistory, {})
+
+keymap.set('n', '<leader>qr', quickfix_with_regex, {noremap = true, silent = true})
 
 -- LSP SETUP
 
@@ -487,7 +606,7 @@ cmp.setup({
 
 require 'nvim-treesitter.configs'.setup {
     -- A list of parser names, or "all" (the four listed parsers should always be installed)
-    ensure_installed = { "lua", "vim", "help", "javascript", "typescript", "solidity", "terraform" },
+    ensure_installed = { "lua", "vim", "help", "javascript", "typescript", "solidity", "terraform", "markdown", "vimdoc", "html", "css", "json", "yaml" },
 
     -- Install parsers synchronously (only applied to `ensure_installed`)
     sync_install = true,
