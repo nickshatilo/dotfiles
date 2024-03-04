@@ -30,10 +30,15 @@ opt.signcolumn = 'yes'
 -- Dont show mode
 opt.showmode = false
 
+-- Decrease update time
+vim.opt.updatetime = 250
+vim.opt.timeoutlen = 300
+
 -- Leader
 g.mapleader = ","
 g.maplocalleader = ","
 
+-- TODO: will be removed by mini-move
 api.nvim_set_keymap('v', 'J', ":m '>+1<CR>gv=gv", {})
 api.nvim_set_keymap('v', 'K', ":m '<-2<CR>gv=gv", {})
 
