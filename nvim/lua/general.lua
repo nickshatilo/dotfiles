@@ -68,8 +68,9 @@ api.nvim_set_keymap('', '<Leader>o', ':BufOnly<CR>', silent_noremap_opts)
 
 -- Edit VIM config
 api.nvim_set_keymap('n', 'm<Leader><Leader>', ':edit $MYVIMRC<CR>', silent_noremap_opts)
+
 -- Reloading VIM config
-api.nvim_set_keymap('n', '<Leader><Leader>', ':luafile $MYVIMRC<CR>', silent_noremap_opts)
+api.nvim_set_keymap('n', '<Leader><Leader>r', ':luafile $MYVIMRC<CR>:PackerCompile<CR>', silent_noremap_opts)
 
 -- Undotree
 api.nvim_set_keymap('n', '<Leader>u', ':UndotreeToggle<CR>', silent_noremap_opts)
