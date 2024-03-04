@@ -10,6 +10,11 @@ local config = function()
                 }
             }
         },
+        extensions = {
+            ['ui-select'] = {
+                require('telescope.themes').get_dropdown(),
+            },
+        }
     })
 
     local telescope_builtin = require('telescope.builtin')
@@ -22,6 +27,10 @@ local config = function()
     keymap.set('n', '\\b', telescope_builtin.buffers, {})
     keymap.set('n', '<Leader>qq', telescope_builtin.quickfix, {})
     keymap.set('n', '<Leader>qh', telescope_builtin.quickfixhistory, {})
+
+    -- Enable telescope extensions, if they are installed
+    pcall(require('telescope').load_extension, 'fzf')
+    pcall(require('telescope').load_extension, 'ui-select')
 end
 
 return {
@@ -29,15 +38,17 @@ return {
         use {
             'nvim-telescope/telescope.nvim', tag = '0.1.x',
             requires = {
-                'nvim-lua/plenary.nvim' ,
+                'nvim-lua/plenary.nvim',
                 'BurntSushi/ripgrep',
             },
             config = config
         }
         use {
+            'nvim-telescope/telescope-ui-select.nvim'
+        }
+        use {
             'nvim-telescope/telescope-fzf-native.nvim',
-            run =
-                'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'
+            run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'
         }
     end
 }

@@ -21,6 +21,15 @@ opt.termguicolors = true
 -- Makes clipboard system one
 opt.clipboard = "unnamedplus"
 
+-- Save undo history
+opt.undofile = true
+
+-- Keep signcolumn on by default
+opt.signcolumn = 'yes'
+
+-- Dont show mode
+opt.showmode = false
+
 -- Leader
 g.mapleader = ","
 g.maplocalleader = ","
@@ -65,11 +74,6 @@ api.nvim_set_keymap('n', '<Leader><Leader>', ':luafile $MYVIMRC<CR>', silent_nor
 -- Undotree
 api.nvim_set_keymap('n', '<Leader>u', ':UndotreeToggle<CR>', silent_noremap_opts)
 
--- Shows trailing spaces
-vim.cmd [[
-:highlight ExtraWhitespace ctermbg=red guibg=red
-:match ExtraWhitespace /\s\+$/
-]]
 -- Delete all trailing spaces
 api.nvim_set_keymap('n', '\\<Space>', ':%s/\\s\\+$//e<CR>', {})
 
@@ -84,3 +88,17 @@ augroup EN
 -- Folds
 api.nvim_set_keymap('v', '<space>', 'zf', { noremap = true }) -- fold
 api.nvim_set_keymap('n', '<space>', 'za', { noremap = true }) -- unfold
+
+-- Terminal mode
+keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
+
+-- Highlight when yanking (copying) text
+--  Try it with `yap` in normal mode
+--  See `:help vim.highlight.on_yank()`
+api.nvim_create_autocmd('TextYankPost', {
+  desc = 'Highlight when yanking (copying) text',
+  group = vim.api.nvim_create_augroup('highlight-yank', { clear = true }),
+  callback = function()
+    vim.highlight.on_yank()
+  end,
+})
