@@ -5,7 +5,18 @@ require('plugins').init_packer(function(use)
     use {
         'lunarvim/Onedarker.nvim',
         config = function()
-            vim.cmd('colorscheme onedarker')
+            -- vim.cmd('colorscheme onedarker')
+        end
+    }
+    use {
+        "catppuccin/nvim",
+        as = "catppuccin",
+        config = function()
+            require('catppuccin').setup({
+                flavour = "mocha",
+            })
+
+            vim.cmd('colorscheme catppuccin')
         end
     }
 
