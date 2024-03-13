@@ -31,6 +31,7 @@ local config = function()
     keymap.set('n', '\\f', telescope_builtin.live_grep, {})
     keymap.set('n', '\\F', telescope_builtin.git_files, {})
     keymap.set('n', '\\b', telescope_builtin.buffers, {})
+    keymap.set('n', '\\B', telescope_builtin.current_buffer_fuzzy_find, {})
     keymap.set('n', '<Leader>qq', telescope_builtin.quickfix, {})
     keymap.set('n', '<Leader>qh', telescope_builtin.quickfixhistory, {})
 

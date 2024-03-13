@@ -38,10 +38,6 @@ vim.opt.timeoutlen = 300
 g.mapleader = ","
 g.maplocalleader = ","
 
--- TODO: will be removed by mini-move
-api.nvim_set_keymap('v', 'J', ":m '>+1<CR>gv=gv", {})
-api.nvim_set_keymap('v', 'K', ":m '<-2<CR>gv=gv", {})
-
 -- NVIM-tree asks to disable netrw
 g.loaded_netrw = 1
 g.loaded_netrwPlugin = 1
@@ -69,7 +65,7 @@ api.nvim_set_keymap('', '<C-p>', ':BufferLineCyclePrev<CR>', silent_noremap_opts
 api.nvim_set_keymap('', '<Leader>w', ':bp<bar>sp<bar>bn<bar>bd<CR>', {})
 
 -- Focus current split
-api.nvim_set_keymap('', '<Leader>o', ':BufOnly<CR>', silent_noremap_opts)
+api.nvim_set_keymap('', '<Leader>o', ':BufOnly!<CR>', silent_noremap_opts)
 
 -- Edit VIM config
 api.nvim_set_keymap('n', 'm<Leader><Leader>', ':edit $MYVIMRC<CR>', silent_noremap_opts)

@@ -47,6 +47,26 @@ require('plugins').init_packer(function(use)
         end
     }
     use {
+      'ThePrimeagen/harpoon',
+      requires = {'nvim-lua/plenary.nvim'},
+      config = function()
+        require('harpoon').setup()
+
+        local mark = require('harpoon.mark')
+        local ui = require('harpoon.ui')
+
+        vim.keymap.set('n', '\\h', ui.toggle_quick_menu, {})
+        vim.keymap.set('n', '<Leader>a', mark.add_file, {})
+
+        vim.keymap.set('n', '<M-n>', ui.nav_next, {})
+        vim.keymap.set('n', '<M-p>', ui.nav_prev, {})
+
+        for i = 1, 9 do
+          vim.keymap.set('n', string.format('<Leader>%d', i), function() ui.nav_file(i) end, {})
+        end
+      end
+    }
+    use {
         'nvim-tree/nvim-tree.lua',
         requires = {
             'nvim-tree/nvim-web-devicons',
@@ -125,6 +145,20 @@ require('plugins').init_packer(function(use)
         'echasnovski/mini.ai',
         config = function()
             require('mini.ai').setup()
+        end
+    }
+
+    use {
+        'echasnovski/mini.move',
+        config = function()
+            require('mini.move').setup({
+                mappings = {
+                    left = 'H',
+                    down = 'J',
+                    up = 'K',
+                    right = 'L',
+                }
+            })
         end
     }
 end)

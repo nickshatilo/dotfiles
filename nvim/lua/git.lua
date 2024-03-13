@@ -55,8 +55,8 @@ return {
                 'tpope/vim-dispatch'
             },
             config = function ()
-                vim.api.nvim_set_keymap('n', '<Leader>g', ':Git<CR>', {})
-                vim.api.nvim_set_keymap('n', '<Leader>G', ':Git<CR>:only<CR>', {})
+                vim.api.nvim_set_keymap('n', '<Leader>gg', ':Git<CR>', {})
+                vim.api.nvim_set_keymap('n', '<Leader>go', ':Git<CR>:only<CR>', {})
             end
         }
         use {
@@ -64,7 +64,12 @@ return {
             config = config_signs
         }
 
-        -- NOT USING, CONSIDER REMOVING
-        -- use 'tpope/vim-rhubarb'
+        use {
+            'ruifm/gitlinker.nvim',
+            requires = 'nvim-lua/plenary.nvim',
+            config = function ()
+                require('gitlinker').setup()
+            end
+        }
     end
 }
