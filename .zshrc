@@ -1,3 +1,5 @@
+export ZVM_INIT_MODE=sourcing
+
 export ZSH="$HOME/.oh-my-zsh"
 export LC_ALL=en_US.UTF-8
 export LC_LANG=en_US.UTF-8
@@ -15,7 +17,7 @@ plugins=(
 	docker-compose
 	tmux
 	extract
-	vi-mode
+	zsh-vi-mode
 	yarn
 	dotenv
 )
@@ -37,8 +39,6 @@ export PATH="/usr/local/sbin:$PATH"
 [ -f ~/.env ] && source ~/.env
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/nick/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/nick/Downloads/google-cloud-sdk/path.zsh.inc'; fi
-
-# The next line enables shell command completion for gcloud.
-if [ -f '/Users/nick/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/nick/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
+source "$(brew --prefix)/share/google-cloud-sdk/path.zsh.inc"
+source "$(brew --prefix)/share/google-cloud-sdk/completion.zsh.inc"
+export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"

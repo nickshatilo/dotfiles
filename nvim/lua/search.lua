@@ -1,7 +1,6 @@
 local config = function()
     local keymap = vim.keymap
-
-    require('telescope').setup({
+require('telescope').setup({
         defaults = {
             mappings = {
                 i = {

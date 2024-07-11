@@ -40,8 +40,8 @@ local function config()
 
         vim.api.nvim_buf_set_keymap(bufnr, 'n', '<space>q', '<cmd>lua vim.diagnostic.setloclist()<CR>', silent_noremap_opts)
 
-        vim.api.nvim_buf_set_keymap(bufnr, 'n', '<Leader>f', '<cmd>lua vim.lsp.buf.format { async = true }<CR>',
-            silent_noremap_opts)
+        -- vim.api.nvim_buf_set_keymap(bufnr, 'n', '<Leader>f', '<cmd>lua vim.lsp.buf.format { async = true }<CR>',
+        --     silent_noremap_opts)
     end)
 
     -- Enables neovim config to properly use lua auto-completion
@@ -188,7 +188,41 @@ return {
                 require("copilot").setup({
                     suggestion = { enabled = false },
                     panel = { enabled = false },
+                    filetypes = {
+                        sh = function ()
+                            if string.match(vim.fs.basename(vim.api.nvim_buf_get_name(0)), '^%.env') then
+                                return false
+                            end
+                            return true
+                        end,
+                    },
                 })
+            end
+        }
+
+        use {
+            'stevearc/conform.nvim',
+            config = function()
+                local conform = require('conform')
+
+                conform.setup({
+                    formatters_by_ft = {
+                        lua = { "stylua" },
+                        javascript = { { "prettierd", "prettier" } },
+                        typescript = { { "prettierd", "prettier" } },
+                        solidity = { "solhint" },
+                    },
+                    formatters = {
+                        solhint = {
+                            command = "solhint",
+                            args = { "--fix" },
+                            format = "raw",
+                        },
+                    }
+                })
+
+                vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
+                vim.keymap.set('n', '<Leader>f', conform.format)
             end
         }
     end

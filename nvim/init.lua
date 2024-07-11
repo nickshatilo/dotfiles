@@ -144,7 +144,10 @@ require('plugins').init_packer(function(use)
     use {
         'echasnovski/mini.ai',
         config = function()
-            require('mini.ai').setup()
+            require('mini.ai').setup({
+                search_method = 'cover',
+                n_lines = 5000,
+            })
         end
     }
 
@@ -158,6 +161,24 @@ require('plugins').init_packer(function(use)
                     up = 'K',
                     right = 'L',
                 }
+            })
+        end
+    }
+
+    use({
+        "iamcco/markdown-preview.nvim",
+        run = function() vim.fn["mkdp#util#install"]() end,
+    })
+
+    use {
+        'kevinhwang91/nvim-bqf',
+        ft = 'qf',
+        config = function ()
+            require('bqf').setup({
+                auto_resize_height = false,
+                preview = {
+                    auto_preview = false,
+                },
             })
         end
     }

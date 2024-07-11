@@ -12,7 +12,7 @@ opt.smarttab = true
 opt.smartindent = true
 
 opt.number = true
-opt.rnu = true
+opt.relativenumber = true
 opt.autoread = true
 
 -- Proper colors
@@ -49,7 +49,9 @@ api.nvim_set_keymap('n', '\\q', ':nohlsearch<CR>', {})
 api.nvim_set_keymap('n', '\\e', ':e<CR>', {})
 
 -- Copy current file absolute path
-api.nvim_set_keymap('n', 'cp', ':let @+ = expand("%")<CR>', {})
+api.nvim_set_keymap('n', 'cp', ':let @+ = expand("%:p")<CR>', {})
+-- Copy current file relative path
+api.nvim_set_keymap('n', 'cP', ':let @+ = expand("%")<CR>', {})
 
 -- Split navigation
 api.nvim_set_keymap('n', '<C-j>', '<C-W>j', {})
@@ -104,3 +106,21 @@ api.nvim_create_autocmd('TextYankPost', {
     vim.highlight.on_yank()
   end,
 })
+
+-- Quickfix toggle
+local function is_quickfix_open()
+    for _, win in pairs(vim.fn.getwininfo()) do
+        if win.quickfix == 1 then
+            return true
+        end
+    end
+    return false
+end
+
+vim.keymap.set('n', '<Leader>qt', function ()
+  if is_quickfix_open() then
+    vim.cmd('cclose')
+  else
+    vim.cmd('copen')
+  end
+end, { silent = true })
