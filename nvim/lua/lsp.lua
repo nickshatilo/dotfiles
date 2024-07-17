@@ -210,6 +210,7 @@ return {
                         lua = { "stylua" },
                         javascript = { { "prettierd", "prettier" } },
                         typescript = { { "prettierd", "prettier" } },
+                        json = { { "prettierd", "prettier" } },
                         solidity = { "solhint" },
                     },
                     formatters = {

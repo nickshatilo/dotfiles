@@ -1,6 +1,7 @@
 local config = function()
     local keymap = vim.keymap
-require('telescope').setup({
+
+    require('telescope').setup({
         defaults = {
             mappings = {
                 i = {
@@ -56,5 +57,20 @@ return {
             'nvim-telescope/telescope-fzf-native.nvim',
             run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build'
         }
+    end,
+    grep_in_folder = function (path)
+        local telescope_builtin = require('telescope.builtin')
+
+        telescope_builtin.find_files({
+            prompt_title = 'Grep files (in path)',
+            cwd = path
+        })
+    end,
+    find_file_in_folder = function (path)
+        local telescope_builtin = require('telescope.builtin')
+        telescope_builtin.find_files({
+            prompt_title = 'Find Files (in path)',
+            cwd = path
+        })
     end
 }

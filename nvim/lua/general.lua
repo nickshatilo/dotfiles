@@ -59,7 +59,7 @@ api.nvim_set_keymap('n', '<C-k>', '<C-W>k', {})
 api.nvim_set_keymap('n', '<C-h>', '<C-W>h', {})
 api.nvim_set_keymap('n', '<C-l>', '<C-W>l', {})
 
--- Next buiffer
+-- Next buffer
 api.nvim_set_keymap('', '<C-n>', ':BufferLineCycleNext<CR>', silent_noremap_opts)
 api.nvim_set_keymap('', '<C-p>', ':BufferLineCyclePrev<CR>', silent_noremap_opts)
 
