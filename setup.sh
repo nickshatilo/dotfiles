@@ -1,10 +1,10 @@
 
 # install stuff if not installed
-# brew install neovim tmux zsh alacritty
+brew install neovim tmux zsh alacritty zsh-vi-mode
 
 # chsh to zsh if not already
-if [ $SHELL != '/opt/homebrew/bin/zsh' ]; then
-	chsh -s /opt/homebrew/bin/zsh
+if [ $SHELL != '/bin/zsh' ]; then
+	chsh -s /bin/zsh
 fi
 
 # Install oh-my-zsh if not installed
@@ -14,6 +14,8 @@ else
 	echo "oh-my-zsh already installed"
 fi
 
+git clone https://github.com/jeffreytse/zsh-vi-mode \
+  $ZSH_CUSTOM/plugins/zsh-vi-mode
 
 if [ ! -L $HOME/.zshrc ]; then
 	ln -s $(pwd)/.zshrc $HOME/.zshrc
@@ -44,8 +46,9 @@ else
 	echo "nvim already linked"
 fi
 
-if [ ! -L $HOME/.alacritty.yml ]; then
-	ln -s $(pwd)/.alacritty.yml $HOME/.config/.alacritty.yml
+if [ ! -L $HOME/.config/.alacritty.toml ]; then
+	mkdir -p $HOME/.config/alacritty
+	ln -s $(pwd)/alacritty.toml $HOME/.config/alacritty/alacritty.toml
 else
 	echo ".alacritty.yml already linked"
 fi
