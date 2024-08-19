@@ -23,7 +23,7 @@ require("plugins").init_packer(function(use)
 	-- Navigation
 	use({
 		"akinsho/bufferline.nvim",
-		tag = "v3.*",
+		tag = "v4.*",
 		requires = "nvim-tree/nvim-web-devicons",
 		config = function()
 			require("bufferline").setup({
