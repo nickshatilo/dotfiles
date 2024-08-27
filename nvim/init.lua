@@ -94,7 +94,13 @@ require("plugins").init_packer(function(use)
 					local get_current_directory = function()
 						local node = api.tree.get_node_under_cursor()
 
-						return node.type == "directory" and node.absolute_path or node.parent.absolute_path
+						if node.type == nil then
+							return vim.fn.getcwd()
+						elseif node.type == "directory" then
+							return node.absolute_path
+						else
+							return node.parent.absolute_path
+						end
 					end
 
 					local grep_in_directory = function()

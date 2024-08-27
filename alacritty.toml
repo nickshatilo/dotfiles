@@ -43,3 +43,6 @@ blue    = '#1a8fff'
 magenta = '#fd28ff'
 cyan    = '#14ffff'
 white   = '#ffffff'
+
+[window]
+startup_mode = 'Fullscreen'
