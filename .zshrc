@@ -13,13 +13,15 @@ plugins=(
 	python
 	brew
 	macos
-	docker
-	docker-compose
+	# docker
+	# docker-compose
 	tmux
 	extract
 	zsh-vi-mode
 	yarn
 	dotenv
+	1password
+	fzf
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -35,6 +37,7 @@ eval "$(rbenv init -)"
 eval "$(nodenv init -)"
 
 export PATH="/usr/local/sbin:$PATH"
+export PATH="/Users/nick/Library/Python/3.9/bin:$PATH"
 
 [ -f ~/.env ] && source ~/.env
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

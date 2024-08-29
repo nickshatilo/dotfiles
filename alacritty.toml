@@ -4,13 +4,13 @@
 normal = { family = "FiraMono Nerd Font Mono", style = "Regular" }  # Default for Linux/BSD: "monospace", Regular
 
 # Bold font style
-# bold = { style = "Regular" }  # Inherits family from normal, Default style: Bold
+bold = { style = "Regular" }  # Inherits family from normal, Default style: Bold
 
 # Italic font style
-# italic = { style = "Regular" }  # Inherits family from normal, Default style: Italic
+italic = { style = "Regular" }  # Inherits family from normal, Default style: Italic
 
 # Bold Italic font style
-# bold_italic = { style = "Regular" }  # Inherits family from normal, Default style: Bold Italic
+bold_italic = { style = "Regular" }  # Inherits family from normal, Default style: Bold Italic
 
 # Font size in points
 size = 16
