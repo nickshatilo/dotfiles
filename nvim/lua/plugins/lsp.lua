@@ -201,7 +201,7 @@ return {
         },
         main = "mason-lspconfig",
         opts = {
-            ensure_installed = { "tsserver", "lua_ls", "solidity_ls" },
+            ensure_installed = { "ts_ls", "lua_ls", "solidity_ls" },
         },
         priority = 49,
     },

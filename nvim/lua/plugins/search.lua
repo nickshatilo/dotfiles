@@ -1,4 +1,26 @@
-local init = function(_, opts)
+local init = function(_, _)
+    local opts = {
+        defaults = {
+            mappings = {
+                i = {
+                    ["<C-k>"] = "move_selection_previous",
+                    ["<C-j>"] = "move_selection_next",
+                },
+            },
+        },
+        extensions = {
+            ["ui-select"] = {
+                require("telescope.themes").get_dropdown(),
+            },
+            fzf = {
+                fuzzy = true,
+                override_generic_sorter = true,
+                override_file_sorter = true,
+                case_mode = "smart_case",
+            },
+        },
+    }
+
     local telescope = require("telescope")
     telescope.setup(opts)
 
@@ -32,27 +54,6 @@ return {
             "nvim-telescope/telescope-ui-select.nvim",
         },
         config = init,
-        opts = {
-            defaults = {
-                mappings = {
-                    i = {
-                        ["<C-k>"] = "move_selection_previous",
-                        ["<C-j>"] = "move_selection_next",
-                    },
-                },
-            },
-            extensions = {
-                ["ui-select"] = {
-                    require("telescope.themes").get_dropdown(),
-                },
-                fzf = {
-                    fuzzy = true,
-                    override_generic_sorter = true,
-                    override_file_sorter = true,
-                    case_mode = "smart_case",
-                },
-            },
-        },
     },
     {
         "nvim-telescope/telescope-fzf-native.nvim",

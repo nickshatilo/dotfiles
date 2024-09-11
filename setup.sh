@@ -1,6 +1,7 @@
 
 # install stuff if not installed
 brew install neovim tmux zsh alacritty zsh-vi-mode
+brew install --cask nikitabobko/tap/aerospace
 
 # chsh to zsh if not already
 if [ $SHELL != '/bin/zsh' ]; then
@@ -23,7 +24,7 @@ else
 	echo ".zshrc already linked"
 fi
 
-# Install TPM if not installed 
+# Install TPM if not installed
 if [ ! -d $home/.tmux/plugins/tpm ]; then
 	git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 else
@@ -50,5 +51,11 @@ if [ ! -L $HOME/.config/.alacritty.toml ]; then
 	mkdir -p $HOME/.config/alacritty
 	ln -s $(pwd)/alacritty.toml $HOME/.config/alacritty/alacritty.toml
 else
-	echo ".alacritty.yml already linked"
+	echo ".alacritty.toml already linked"
+fi
+
+if [ ! -L $HOME/.aerospace.toml ]; then
+	ln -s $(pwd)/aerospace.toml $HOME/.aerospace.toml
+else
+	echo ".aerospace.toml already linked"
 fi

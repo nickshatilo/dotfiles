@@ -4,23 +4,23 @@ return {
         dependencies = "nvim-tree/nvim-web-devicons",
         lazy = false,
         opts = {
-                options = {
-                    buffer_close_icon = "",
-                    modified_icon = "●",
-                    close_icon = "",
-                    left_trunc_marker = "",
-                    right_trunc_marker = "",
-                    offsets = {
-                        {
-                            filetype = "NvimTree",
-                            text = "Explorer",
-                            text_align = "left",
-                            separator = true,
-                        },
+            options = {
+                buffer_close_icon = "",
+                modified_icon = "●",
+                close_icon = "",
+                left_trunc_marker = "",
+                right_trunc_marker = "",
+                offsets = {
+                    {
+                        filetype = "NvimTree",
+                        text = "Explorer",
+                        text_align = "left",
+                        separator = true,
                     },
-                    color_icons = true,
-                }
-        }
+                },
+                color_icons = true,
+            },
+        },
     },
     {
         "nvim-tree/nvim-tree.lua",
@@ -77,6 +77,14 @@ return {
                     vim.cmd("NvimTreeClose")
                 end,
             })
+
+            vim.api.nvim_create_autocmd("DirChanged", {
+                pattern = "*",
+                callback = function()
+                    local current_dir = vim.fn.getcwd()
+                    require("nvim-tree.api").tree.change_root(current_dir)
+                end,
+            })
         end,
     },
     {
@@ -100,5 +108,5 @@ return {
                 end, {})
             end
         end,
-    }
+    },
 }

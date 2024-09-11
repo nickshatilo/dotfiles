@@ -2,12 +2,14 @@ return {
   "yetone/avante.nvim",
   event = "VeryLazy",
   lazy = true,
+  build = "make",
   opts = {
     -- add any opts here
   },
   keys = {
     { "<leader>aa", function() require("avante.api").ask() end, desc = "avante: ask", mode = { "n", "v" } },
     { "<leader>ar", function() require("avante.api").refresh() end, desc = "avante: refresh" },
+    { "<leader>at", function() require("avante.api").toggle() end, desc = "avante: toggle" },
     { "<leader>ae", function() require("avante.api").edit() end, desc = "avante: edit", mode = "v" },
   },
   dependencies = {
