@@ -64,7 +64,7 @@ return {
     grep_in_folder = function(path)
         local telescope_builtin = require("telescope.builtin")
 
-        telescope_builtin.grep_files({
+        telescope_builtin.live_grep({
             prompt_title = "Grep files (in path)",
             cwd = path,
         })

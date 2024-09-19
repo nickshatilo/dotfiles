@@ -223,7 +223,7 @@ return {
     {
         "zbirenbaum/copilot.lua",
         main = "copilot",
-        enabled = false,
+        enabled = true,
         opts = {
             suggestion = { enabled = false },
             panel = { enabled = false },

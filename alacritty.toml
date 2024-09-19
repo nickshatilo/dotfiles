@@ -45,4 +45,4 @@ cyan    = '#14ffff'
 white   = '#ffffff'
 
 [window]
-startup_mode = 'Fullscreen'
+# startup_mode = 'Fullscreen'
