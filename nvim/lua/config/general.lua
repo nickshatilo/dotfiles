@@ -69,18 +69,6 @@ api.nvim_set_keymap("", "<Leader>w", ":bp<bar>sp<bar>bn<bar>bd<CR>", {})
 -- Focus current split
 api.nvim_set_keymap("", "<Leader>o", ":BufferLineCloseOthers<CR>", silent_noremap_opts)
 
--- Edit VIM config
-api.nvim_set_keymap("n", "m<Leader><Leader>", ":edit $MYVIMRC<CR>", silent_noremap_opts)
-
--- Reloading VIM config
-api.nvim_set_keymap("n", "<Leader><Leader>r", ":luafile $MYVIMRC<CR>:PackerCompile<CR>", silent_noremap_opts)
-
--- Undotree
-api.nvim_set_keymap("n", "<Leader>u", ":UndotreeToggle<CR>", silent_noremap_opts)
-
--- Delete all trailing spaces
-api.nvim_set_keymap("n", "\\<Space>", ":%s/\\s\\+$//e<CR>", {})
-
 -- Skip quickfix window when switching buffers
 vim.cmd([[
 augroup qf

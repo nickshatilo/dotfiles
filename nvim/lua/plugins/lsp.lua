@@ -113,23 +113,28 @@ function init_cmp(_, _)
             completeopt = "menu,menuone,noinsert",
         },
         window = {
+            completion = cmp.config.window.bordered(),
             documention = cmp.config.window.bordered(),
         },
         sources = {
-
             { name = "path", group_index = 2 },
             { name = "buffer", group_index = 2, keyword_length = 3 },
+            { name = "cmpline", group_index = 2 },
 
             { name = "nvim_lsp", group_index = 2 },
+            { name = "nvim_lsp_signature_help" },
             { name = "nvim_lua", group_index = 2 },
 
+            { name = "supermaven", group_index = 2 },
             { name = "copilot", group_index = 2 },
 
             { name = "luasnip", group_index = 2, keyword_length = 2 },
+
+            { name = "avante_mentions", group_index = 2 },
         },
         mapping = {
             -- confirm completion item
-            ["<CR>"] = cmp.mapping.confirm({ select = false }),
+            ["<CR>"] = cmp.mapping.confirm({ select = true }),
 
             -- toggle completion menu
             ["<C-a>"] = cmp_action.toggle_completion(),
@@ -160,7 +165,7 @@ function init_cmp(_, _)
         sorting = {
             priority_weight = 2,
             comparators = {
-                require("copilot_cmp.comparators").prioritize,
+                -- require("copilot_cmp.comparators").prioritize,
 
                 -- Below is the default comparitor list and order for nvim-cmp
                 cmp.config.compare.offset,
@@ -175,6 +180,23 @@ function init_cmp(_, _)
                 cmp.config.compare.order,
             },
         },
+    })
+
+    cmp.setup.cmdline({ "/", "?" }, {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = {
+            { name = "buffer" },
+        },
+    })
+
+    cmp.setup.cmdline(":", {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = cmp.config.sources({
+            { name = "path" },
+        }, {
+            { name = "cmdline" },
+        }),
+        matching = { disallow_symbol_nonprefix_matching = false },
     })
 end
 
@@ -213,6 +235,7 @@ return {
             { "hrsh7th/cmp-nvim-lsp" }, -- Required
             { "hrsh7th/cmp-buffer" }, -- Optional
             { "hrsh7th/cmp-path" }, -- Optional
+            { "hrsh7th/cmp-cmdline" }, -- Optional
             { "saadparwaiz1/cmp_luasnip" }, -- Optional
             { "hrsh7th/cmp-nvim-lua" }, -- Optional
             { "zbirenbaum/copilot-cmp" },
@@ -223,7 +246,7 @@ return {
     {
         "zbirenbaum/copilot.lua",
         main = "copilot",
-        enabled = true,
+        enabled = false,
         opts = {
             suggestion = { enabled = false },
             panel = { enabled = false },
@@ -239,6 +262,27 @@ return {
         config = function(_, opts)
             require("copilot_cmp").setup()
             require("copilot").setup(opts)
+        end,
+    },
+    -- Supermaven
+    --
+    {
+        "supermaven-inc/supermaven-nvim",
+        opts = {
+            log_level = "warn",
+            disable_inline_completion = true,
+            disable_keymaps = true,
+            ignore_filetypes = { "sh" },
+            -- condition = function()
+            --     -- returns true if a dotfile
+            --     -- otherwise false
+            --
+            --     local filename = vim.fn.expand "%:t"
+            --     return filename:sub(1, 1) == "."
+            -- end,
+        },
+        config = function(_, opts)
+            require("supermaven-nvim").setup(opts)
         end,
     },
 }

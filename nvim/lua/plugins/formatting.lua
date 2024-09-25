@@ -32,7 +32,7 @@ return {
             solhint = {
                 command = "solhint",
                 args = { "--fix" },
-                format = "raw",
+                -- format = "raw",
             },
             auto_indent = {
                 format = function(_)
