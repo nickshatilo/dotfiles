@@ -2,7 +2,7 @@ return {
     -- General treesitter
     {
         "nvim-treesitter/nvim-treesitter",
-        version = "v0.9.x",
+        version = "v0.9.1",
         build = ":TSUpdate",
         main = "nvim-treesitter.configs",
         opts = {
@@ -21,7 +21,6 @@ return {
                 "json",
                 "yaml",
                 "func",
-                "tlb",
             },
 
             -- Install parsers synchronously (only applied to `ensure_installed`)
@@ -34,13 +33,12 @@ return {
                 additional_vim_regex_highlighting = false,
 
                 -- Or use a function for more flexibility, e.g. to disable slow treesitter highlight for large files
-                disable = function(_, buf)
-                    local max_filesize = 100 * 1024 -- 100 KB
-                    local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-                    if ok and stats and stats.size > max_filesize then
-                        return true
-                    end
-                end,
+                -- disable = function(_, buf)
+                -- local max_filesize = 100 * 1024 -- 100 KB
+                -- local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+                -- if ok and stats and stats.size > max_filesize then
+                --     return true
+                -- end
             },
 
             indent = {
@@ -61,35 +59,20 @@ return {
             },
         },
         config = function(_, opts)
-            -- TLB Support
-            vim.filetype.add({
-                extension = {
-                    tlb = "tlb",
-                },
-            })
             vim.filetype.add({
                 extension = {
                     func = "func",
                 },
             })
 
-            vim.treesitter.language.register("tlb", "tlb")
-            local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
-
-            parser_config.tlb = {
-                install_info = {
-                    url = "~/Dev/own/sspp/tree-sitter-tlb", -- local path or git repo
-                    files = { "src/parser.c" }, -- note that some parsers also require src/scanner.c or src/scanner.cc
-                    -- optional entries:
-                    branch = "main", -- default branch in case of git repo if different from master
-                    generate_requires_npm = true, -- if stand-alone parser without npm dependencies
-                    requires_generate_from_grammar = true, -- if folder contains pre-generated src/parser.c
-                },
-                filetype = "tlb", -- if filetype does not match the parser name
-            }
-
             require("nvim-treesitter.configs").setup(opts)
+            -- require("tree-sitter-tlb").setup()
         end,
+    },
+    {
+        "nickshatilo/tree-sitter-tlb",
+        opts = {},
+        lazy = false,
     },
     {
         "nvim-treesitter/nvim-treesitter-context",
