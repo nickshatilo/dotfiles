@@ -5,10 +5,10 @@ return {
     build = "make",
     opts = {
         provider = "claude",
-        auto_suggestions_provider = "copilot",
+        -- auto_suggestions_provider = "copilot",
     },
     behaviour = {
-        auto_suggestions = true, -- Experimental stage
+        auto_suggestions = false, -- Experimental stage
     },
     keys = {
         {

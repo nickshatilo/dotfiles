@@ -1,6 +1,6 @@
 
 # install stuff if not installed
-brew install neovim tmux zsh alacritty zsh-vi-mode
+brew install neovim tmux zsh alacritty zsh-vi-mode cmake lsd btop ripgrep tmux-sessionizer
 brew install --cask nikitabobko/tap/aerospace
 
 # chsh to zsh if not already
@@ -47,9 +47,8 @@ else
 	echo "nvim already linked"
 fi
 
-if [ ! -L $HOME/.config/.alacritty.toml ]; then
-	mkdir -p $HOME/.config/alacritty
-	ln -s $(pwd)/alacritty.toml $HOME/.config/alacritty/alacritty.toml
+if [ ! -L $HOME/.config/.alacritty ]; then
+	ln -F -s $(pwd)/alacritty $HOME/.config
 else
 	echo ".alacritty.toml already linked"
 fi

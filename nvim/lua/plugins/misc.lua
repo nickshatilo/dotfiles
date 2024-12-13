@@ -9,9 +9,6 @@ return {
         opts = {},
     },
 
-    -- Buffers helper
-    -- {"vim-scripts/BufOnly.vim"},
-
     -- Surround
     {"tpope/vim-surround"},
 
