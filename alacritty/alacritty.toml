@@ -15,7 +15,12 @@ bold_italic = { style = "Regular" }  # Inherits family from normal, Default styl
 # Font size in points
 size = 16
 
+[window]
+decorations = "none"
+
 [general]
 import = [
     "~/.config/alacritty/themes/catppuccin-mocha.toml"
 ]
+
+
