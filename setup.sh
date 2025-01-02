@@ -1,7 +1,7 @@
 
 # install stuff if not installed
-brew install neovim tmux zsh alacritty zsh-vi-mode cmake lsd btop ripgrep tmux-sessionizer
-brew install --cask nikitabobko/tap/aerospace
+brew install neovim tmux zsh zsh-vi-mode cmake lsd btop ripgrep tmux-sessionizer
+brew install --cask ghostty nikitabobko/tap/aerospace
 
 # chsh to zsh if not already
 if [ $SHELL != '/bin/zsh' ]; then
@@ -40,6 +40,7 @@ fi
 
 mkdir -p $HOME/.config
 mkdir -p $HOME/.config/nvim
+mkdir -p $HOME/.config/ghostty/
 
 if [ ! -L $HOME/.config/nvim ]; then
 	ln -F -s $(pwd)/nvim $HOME/.config
@@ -47,10 +48,10 @@ else
 	echo "nvim already linked"
 fi
 
-if [ ! -L $HOME/.config/.alacritty ]; then
-	ln -F -s $(pwd)/alacritty $HOME/.config
+if [ ! -L $HOME/.config/ghostty/config ]; then
+	ln -s $(pwd)/ghostty $HOME/.config/ghostty/config
 else
-	echo ".alacritty.toml already linked"
+	echo "ghostty config already linked"
 fi
 
 if [ ! -L $HOME/.aerospace.toml ]; then
