@@ -1,4 +1,4 @@
-local function on_lsp_attach(_, bufnr)
+local function on_lsp_attach(bufnr)
     local silent_noremap_opts = { noremap = true, silent = true }
 
     -- Jumps
@@ -62,20 +62,36 @@ local function on_lsp_attach(_, bufnr)
 end
 
 local function init(_, _)
-    local lsp = require("lsp-zero").preset({})
+    -- local lsp = require("lsp-zero").preset({})
 
-    lsp.on_attach(on_lsp_attach)
+    -- lsp.on_attach(on_lsp_attach)
 
     -- Enables neovim config to properly use lua auto-completion
-    require("lspconfig").lua_ls.setup(lsp.nvim_lua_ls())
+    -- require("lspconfig").lua_ls.setup(lsp.nvim_lua_ls())
 
-    lsp.setup()
+    -- lsp.setup()
 
-    lsp.set_sign_icons({
-        error = "✘",
-        warn = "▲",
-        hint = "⚑",
-        info = "",
+    -- lsp.set_sign_icons({
+    --     error = "✘",
+    --     warn = "▲",
+    --     hint = "⚑",
+    --     info = "",
+    -- })
+
+    vim.opt.signcolumn = 'yes'
+
+    local lspconfig_defaults = require('lspconfig').util.default_config
+    lspconfig_defaults.capabilities = vim.tbl_deep_extend(
+        'force',
+        lspconfig_defaults.capabilities,
+        require('cmp_nvim_lsp').default_capabilities()
+    )
+
+    vim.api.nvim_create_autocmd('LspAttach', {
+        desc = 'LSP actions',
+        callback = function(event)
+            on_lsp_attach(event.buf)
+        end,
     })
 
     vim.diagnostic.config({
@@ -93,7 +109,7 @@ end
 
 function init_cmp(_, _)
     local cmp = require("cmp")
-    local cmp_action = require("lsp-zero.cmp").action()
+    -- local cmp_action = require("lsp-zero.cmp").action()
 
     require("luasnip.loaders.from_vscode").lazy_load()
 
@@ -137,7 +153,7 @@ function init_cmp(_, _)
             ["<CR>"] = cmp.mapping.confirm({ select = true }),
 
             -- toggle completion menu
-            ["<C-a>"] = cmp_action.toggle_completion(),
+            -- ["<C-a>"] = cmp_action.toggle_completion(),
 
             -- tab complete
             ["<Tab>"] = vim.schedule_wrap(function(fallback)
@@ -150,8 +166,8 @@ function init_cmp(_, _)
             ["<S-Tab>"] = cmp.mapping.select_prev_item(),
 
             -- navigate between snippet placeholder
-            ["<C-d>"] = cmp_action.luasnip_jump_forward(),
-            ["<C-b>"] = cmp_action.luasnip_jump_backward(),
+            -- ["<C-d>"] = cmp_action.luasnip_jump_forward(),
+            -- ["<C-b>"] = cmp_action.luasnip_jump_backward(),
 
             -- scroll documention window
             ["<C-f>"] = cmp.mapping.scroll_docs(5),
@@ -201,20 +217,10 @@ function init_cmp(_, _)
 end
 
 return {
-    {
-        "VonHeikemen/lsp-zero.nvim",
-        branch = "v2.x",
-        -- main = "lsp-zero",
-        dependencies = {
-            -- LSP Support
-            { "neovim/nvim-lspconfig" }, -- Required
+    { "neovim/nvim-lspconfig", config = init}, -- Required
+    { "L3MON4D3/LuaSnip" }, -- Required
+    { "rafamadriz/friendly-snippets" }, -- Optional
 
-            -- Snippets
-            { "L3MON4D3/LuaSnip" }, -- Required
-            { "rafamadriz/friendly-snippets" }, -- Optional
-        },
-        config = init,
-    },
     -- Auto provisioning
     {
         "williamboman/mason-lspconfig.nvim",

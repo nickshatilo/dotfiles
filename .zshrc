@@ -51,3 +51,5 @@ if [ -f '/Users/nick/.google-cloud-sdk/path.zsh.inc' ]; then . '/Users/nick/.goo
 if [ -f '/Users/nick/.google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/nick/.google-cloud-sdk/completion.zsh.inc'; fi
 
 bindkey -s ^f "tms\n"
+
+export PATH="$HOME/.local/bin:$PATH"

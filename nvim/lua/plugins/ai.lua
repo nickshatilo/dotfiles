@@ -5,10 +5,32 @@ return {
     build = "make",
     opts = {
         provider = "claude",
-        -- auto_suggestions_provider = "copilot",
-    },
-    behaviour = {
-        auto_suggestions = false, -- Experimental stage
+        -- provider = "deepseek",
+        file_selector = {
+            provider = "telescope",
+        },
+        providers = {
+            deepseek = {
+                __inherited_from = "openai",
+                api_key_name = "DEEPSEEK_API_KEY",
+                endpoint = "https://api.deepseek.com",
+                model = "deepseek-reasoner",
+            },
+            groq = {
+                __inherited_from = 'openai',
+                api_key_name = 'GROQ_API_KEY',
+                endpoint = 'https://api.groq.com/openai/v1/',
+                model = 'qwen-2.5-coder-32b',
+                timeout = 100000, -- Timeout in milliseconds
+                max_tokens = 40960,
+            },
+        },
+        cursor_applying_provider = 'groq',
+        auto_suggestions_provider = 'claude',
+        behaviour = {
+            auto_suggestions = false, -- Experimental stage
+            enable_cursor_planning_mode = true,
+        },
     },
     keys = {
         {
@@ -17,6 +39,14 @@ return {
                 require("avante.api").ask()
             end,
             desc = "avante: ask",
+            mode = { "n", "v" },
+        },
+        {
+            "<leader>ac",
+            function()
+                require("avante.api").chat()
+            end,
+            desc = "avante: chat",
             mode = { "n", "v" },
         },
         {
@@ -43,11 +73,12 @@ return {
         },
     },
     dependencies = {
-        -- "stevearc/dressing.nvim",
+        "stevearc/dressing.nvim",
         "nvim-lua/plenary.nvim",
         "MunifTanjim/nui.nvim",
         --- The below dependencies are optional,
         "nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
+        "nvim-telescope/telescope.nvim",
         {
             -- support for image pasting
             "HakonHarnes/img-clip.nvim",

@@ -66,13 +66,17 @@ return {
             })
 
             require("nvim-treesitter.configs").setup(opts)
-            -- require("tree-sitter-tlb").setup()
         end,
     },
     {
         "nickshatilo/tree-sitter-tlb",
         opts = {},
         lazy = false,
+    },
+    {
+        'nickshatilo/tree-sitter-tolk',
+        lazy = false,
+        opts = {},
     },
     {
         "nvim-treesitter/nvim-treesitter-context",
@@ -92,4 +96,5 @@ return {
 
     -- Custom lang support
     { "vyperlang/vim-vyper" },
+    { "prisma/vim-prisma" }
 }

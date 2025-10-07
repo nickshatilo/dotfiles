@@ -36,6 +36,7 @@ return {
     {
         "kevinhwang91/nvim-bqf",
         name = "bfq",
+        enabled = false,
         ft = "qf",
         opts = {
                 auto_resize_height = false,
