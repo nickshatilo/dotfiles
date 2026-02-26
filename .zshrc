@@ -11,8 +11,6 @@ plugins=(
 	colorize
 	pip
 	python
-	brew
-	macos
 	docker
 	docker-compose
 	tmux
@@ -22,6 +20,12 @@ plugins=(
 	1password
 	fzf
 )
+
+if [[ "$OSTYPE" == darwin* ]]; then
+	plugins+=(brew macos)
+else
+	plugins+=(zsh-vi-mode)
+fi
 
 source $ZSH/oh-my-zsh.sh
 
@@ -34,22 +38,17 @@ alias l="lsd"
 alias ls="lsd"
 
 export PATH="/usr/local/sbin:$PATH"
-export PATH="/Library/Frameworks/Python.framework/Versions/3.11/bin:$PATH"
+
+if [[ "$OSTYPE" == darwin* ]]; then
+	export PATH="/Library/Frameworks/Python.framework/Versions/3.11/bin:$PATH"
+fi
 
 [ -f ~/.env ] && source ~/.env
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-source $(brew --prefix)/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
-
-source <(fzf --zsh)
-source <(tms --generate zsh)
-
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f '/Users/nick/.google-cloud-sdk/path.zsh.inc' ]; then . '/Users/nick/.google-cloud-sdk/path.zsh.inc'; fi
-
-# The next line enables shell command completion for gcloud.
-if [ -f '/Users/nick/.google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/nick/.google-cloud-sdk/completion.zsh.inc'; fi
-
-bindkey -s ^f "tms\n"
+if [[ "$OSTYPE" == darwin* ]]; then
+	source $(brew --prefix)/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+fi
 
 export PATH="$HOME/.local/bin:$PATH"
+alias c="claude --dangerously-skip-permissions"
