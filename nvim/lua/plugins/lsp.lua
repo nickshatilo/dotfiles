@@ -141,12 +141,7 @@ function init_cmp(_, _)
             { name = "nvim_lsp_signature_help" },
             { name = "nvim_lua", group_index = 2 },
 
-            { name = "supermaven", group_index = 2 },
-            { name = "copilot", group_index = 2 },
-
             { name = "luasnip", group_index = 2, keyword_length = 2 },
-
-            { name = "avante_mentions", group_index = 2 },
         },
         mapping = {
             -- confirm completion item
@@ -181,8 +176,6 @@ function init_cmp(_, _)
         sorting = {
             priority_weight = 2,
             comparators = {
-                -- require("copilot_cmp.comparators").prioritize,
-
                 -- Below is the default comparitor list and order for nvim-cmp
                 cmp.config.compare.offset,
                 -- cmp.config.compare.scopes, --this is commented in nvim-cmp too
@@ -244,51 +237,7 @@ return {
             { "hrsh7th/cmp-cmdline" }, -- Optional
             { "saadparwaiz1/cmp_luasnip" }, -- Optional
             { "hrsh7th/cmp-nvim-lua" }, -- Optional
-            { "zbirenbaum/copilot-cmp" },
         },
         config = init_cmp,
-    },
-    -- Copilot
-    {
-        "zbirenbaum/copilot.lua",
-        main = "copilot",
-        enabled = false,
-        opts = {
-            suggestion = { enabled = false },
-            panel = { enabled = false },
-            filetypes = {
-                sh = function()
-                    if string.match(vim.fs.basename(vim.api.nvim_buf_get_name(0)), "^%.env") then
-                        return false
-                    end
-                    return true
-                end,
-            },
-        },
-        config = function(_, opts)
-            require("copilot_cmp").setup()
-            require("copilot").setup(opts)
-        end,
-    },
-    -- Supermaven
-    --
-    {
-        "supermaven-inc/supermaven-nvim",
-        opts = {
-            log_level = "warn",
-            disable_inline_completion = true,
-            disable_keymaps = true,
-            ignore_filetypes = { "sh" },
-            -- condition = function()
-            --     -- returns true if a dotfile
-            --     -- otherwise false
-            --
-            --     local filename = vim.fn.expand "%:t"
-            --     return filename:sub(1, 1) == "."
-            -- end,
-        },
-        config = function(_, opts)
-            require("supermaven-nvim").setup(opts)
-        end,
     },
 }
